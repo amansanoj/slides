@@ -8,37 +8,139 @@ export function renderSlidePage(opts: SlidePageOptions): string {
   const { uuid, title, isProtected } = opts;
 
   return `<!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>${escapeHtml(title)}</title>
 
+  <!-- Brand: design tokens + Instrument Sans, Geist, Geist Mono -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@amansanoj/brand/globals.css" />
+
   <!-- Reveal.js -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/black.css" id="theme" />
   <!-- Code highlighting -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/monokai.css" />
 
-  <!-- Print / PDF export CSS -->
   <style>
-    @media print {
-      .reveal .slide-background { display: block !important; }
+    /* ── Brand-aware reveal.js theme override ───────────────
+       Replaces the black theme entirely with brand tokens.    */
+    .reveal-viewport {
+      background: var(--background);
     }
-  </style>
 
-  <style>
-    /* ── Password modal ───────────────────────────── */
+    .reveal {
+      font-family: var(--font-body);
+      font-size: 38px;
+      color: var(--foreground);
+    }
+
+    .reveal h1,
+    .reveal h2,
+    .reveal h3,
+    .reveal h4,
+    .reveal h5,
+    .reveal h6 {
+      font-family: var(--font-display);
+      color: var(--foreground);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      text-transform: none;
+      text-shadow: none;
+    }
+
+    .reveal h1 { font-size: 2.5em; }
+    .reveal h2 { font-size: 1.6em; }
+    .reveal h3 { font-size: 1.3em; }
+
+    .reveal a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .reveal a:hover {
+      color: var(--primary-light);
+      text-shadow: none;
+      border: none;
+    }
+
+    .reveal strong { color: var(--foreground); }
+
+    .reveal blockquote {
+      background: var(--card);
+      border-left: 4px solid var(--primary);
+      border-radius: var(--radius);
+      padding: 0.5em 1em;
+      font-style: italic;
+      box-shadow: none;
+    }
+
+    .reveal code {
+      font-family: var(--font-mono);
+      background: var(--card);
+      color: var(--primary);
+      padding: 0.1em 0.35em;
+      border-radius: calc(var(--radius) / 2);
+      font-size: 0.85em;
+    }
+
+    .reveal pre {
+      font-family: var(--font-mono);
+      box-shadow: none;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+
+    .reveal pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    .reveal table th {
+      color: var(--primary);
+    }
+
+    .reveal table tr:nth-child(even) {
+      background: var(--card);
+    }
+
+    /* Progress bar */
+    .reveal .progress {
+      background: var(--border);
+      color: var(--primary);
+    }
+
+    /* Slide number */
+    .reveal .slide-number {
+      background: transparent;
+      color: var(--muted-foreground);
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+    }
+
+    /* Controls arrows */
+    .reveal .controls {
+      color: var(--primary);
+    }
+
+    /* Selection */
+    .reveal ::selection {
+      background: color-mix(in oklch, var(--primary) 30%, transparent);
+      color: var(--foreground);
+    }
+
+    /* ── Password modal ─────────────────────────────────────── */
     #password-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.92);
+      background: color-mix(in oklch, var(--background) 92%, transparent);
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 9999;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-family: var(--font-body);
     }
 
     #password-overlay.hidden {
@@ -46,24 +148,26 @@ export function renderSlidePage(opts: SlidePageOptions): string {
     }
 
     .modal {
-      background: #1a1d27;
-      border: 1px solid #2a2d3a;
-      border-radius: 12px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: calc(var(--radius) * 2);
       padding: 2rem;
       width: 100%;
       max-width: 380px;
       margin: 1rem;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      box-shadow: 0 20px 60px color-mix(in oklch, var(--background) 50%, black);
     }
 
     .modal h2 {
+      font-family: var(--font-display);
       margin: 0 0 0.25rem;
       font-size: 1.25rem;
-      color: #e8eaf0;
+      color: var(--card-foreground);
+      font-weight: 700;
     }
 
     .modal p {
-      color: #7c7f8e;
+      color: var(--muted-foreground);
       font-size: 0.9rem;
       margin: 0 0 1.5rem;
     }
@@ -71,51 +175,53 @@ export function renderSlidePage(opts: SlidePageOptions): string {
     .modal label {
       display: block;
       font-size: 0.85rem;
-      color: #a0a3b0;
+      color: var(--muted-foreground);
       margin-bottom: 0.4rem;
     }
 
     .modal input[type="password"] {
       width: 100%;
       padding: 0.65rem 0.85rem;
-      background: #0f1117;
-      border: 1px solid #2a2d3a;
-      border-radius: 8px;
-      color: #e8eaf0;
+      background: var(--background);
+      border: 1px solid var(--input);
+      border-radius: var(--radius);
+      color: var(--foreground);
+      font-family: var(--font-body);
       font-size: 1rem;
       outline: none;
       transition: border-color 0.2s;
     }
 
     .modal input[type="password"]:focus {
-      border-color: #7c6df5;
+      border-color: var(--ring);
     }
 
     .modal button {
       width: 100%;
       margin-top: 1rem;
       padding: 0.65rem;
-      background: #7c6df5;
-      color: #fff;
+      background: var(--primary);
+      color: var(--primary-foreground);
       border: none;
-      border-radius: 8px;
+      border-radius: var(--radius);
+      font-family: var(--font-body);
       font-size: 1rem;
       font-weight: 600;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: opacity 0.2s;
     }
 
-    .modal button:hover { background: #9b8ff7; }
-    .modal button:disabled { background: #4a4560; cursor: not-allowed; }
+    .modal button:hover { opacity: 0.85; }
+    .modal button:disabled { opacity: 0.4; cursor: not-allowed; }
 
     .error-msg {
-      color: #f87171;
+      color: var(--destructive);
       font-size: 0.85rem;
       margin-top: 0.5rem;
       min-height: 1.1rem;
     }
 
-    /* ── Toolbar ──────────────────────────────────── */
+    /* ── Toolbar ────────────────────────────────────────────── */
     #slide-toolbar {
       position: fixed;
       top: 10px;
@@ -123,29 +229,40 @@ export function renderSlidePage(opts: SlidePageOptions): string {
       display: flex;
       gap: 6px;
       z-index: 100;
-      opacity: 0.3;
+      opacity: 0.25;
       transition: opacity 0.2s;
     }
 
     #slide-toolbar:hover { opacity: 1; }
 
     .toolbar-btn {
-      background: rgba(0,0,0,0.6);
-      border: 1px solid rgba(255,255,255,0.15);
-      color: #fff;
+      background: color-mix(in oklch, var(--card) 80%, transparent);
+      border: 1px solid var(--border);
+      color: var(--foreground);
       padding: 5px 10px;
-      border-radius: 6px;
+      border-radius: var(--radius);
+      font-family: var(--font-body);
       font-size: 0.75rem;
       cursor: pointer;
       text-decoration: none;
       display: inline-flex;
       align-items: center;
       gap: 4px;
+      backdrop-filter: blur(8px);
+      transition: border-color 0.2s, background 0.2s;
     }
 
     .toolbar-btn:hover {
-      background: rgba(124, 109, 245, 0.5);
-      border-color: #7c6df5;
+      background: color-mix(in oklch, var(--primary) 15%, var(--card));
+      border-color: var(--primary);
+      color: var(--foreground);
+    }
+
+    /* Print / PDF mode */
+    @media print {
+      #slide-toolbar { display: none !important; }
+      #password-overlay { display: none !important; }
+      .reveal .slide-background { display: block !important; }
     }
   </style>
 </head>
@@ -182,9 +299,8 @@ export function renderSlidePage(opts: SlidePageOptions): string {
   <!-- Reveal.js presentation container -->
   <div class="reveal">
     <div class="slides">
-      <!-- Slides are injected here by JavaScript -->
       <section id="loading-section">
-        <p style="color:#7c7f8e;font-size:0.9rem">Loading presentation…</p>
+        <p style="color:var(--muted-foreground);font-size:0.5em">Loading…</p>
       </section>
     </div>
   </div>
@@ -202,7 +318,7 @@ export function renderSlidePage(opts: SlidePageOptions): string {
     const UUID = ${JSON.stringify(uuid)};
     const IS_PROTECTED = ${JSON.stringify(isProtected)};
 
-    // ── Toolbar ────────────────────────────────────────────────────────────
+    // ── Toolbar ──────────────────────────────────────────────
 
     document.getElementById('fullscreen-btn').addEventListener('click', () => {
       if (!document.fullscreenElement) {
@@ -212,19 +328,19 @@ export function renderSlidePage(opts: SlidePageOptions): string {
       }
     });
 
-    // PDF export: navigate to ?print-pdf preserving the current path
+    // PDF export: navigate to ?print-pdf preserving the current UUID path
     document.getElementById('pdf-btn').addEventListener('click', () => {
       const url = new URL(window.location.href);
       url.searchParams.set('print-pdf', '');
       window.open(url.toString(), '_blank');
     });
 
-    // In print-pdf mode, hide toolbar and load slides immediately (no modal check)
+    // In print-pdf mode, hide toolbar
     if (window.location.search.includes('print-pdf')) {
       document.getElementById('slide-toolbar').style.display = 'none';
     }
 
-    // ── Reveal initialisation ──────────────────────────────────────────────
+    // ── Reveal initialisation ────────────────────────────────
 
     async function loadAndInitSlides() {
       try {
@@ -232,7 +348,6 @@ export function renderSlidePage(opts: SlidePageOptions): string {
         if (!res.ok) throw new Error('Failed to load slides (' + res.status + ')');
         const markdown = await res.text();
 
-        // Replace the loading section with a Markdown section
         const slidesContainer = document.querySelector('.reveal .slides');
         slidesContainer.innerHTML = \`
           <section
@@ -259,7 +374,6 @@ export function renderSlidePage(opts: SlidePageOptions): string {
           progress: true,
           keyboard: true,
           overview: true,
-          // PDF export
           pdfMaxPagesPerSlide: 1,
           pdfSeparateFragments: false,
           plugins: [RevealMarkdown, RevealHighlight, RevealNotes, RevealZoom, RevealSearch],
@@ -268,18 +382,17 @@ export function renderSlidePage(opts: SlidePageOptions): string {
         const slidesContainer = document.querySelector('.reveal .slides');
         slidesContainer.innerHTML = \`
           <section>
-            <h2 style="color:#f87171">Error loading presentation</h2>
-            <p style="color:#7c7f8e">\${err.message}</p>
+            <h2 style="color:var(--destructive)">Error loading presentation</h2>
+            <p style="color:var(--muted-foreground)">\${err.message}</p>
           </section>
         \`;
         Reveal.initialize({ plugins: [RevealHighlight] });
       }
     }
 
-    // ── Password modal logic ───────────────────────────────────────────────
+    // ── Password modal logic ─────────────────────────────────
 
-    // In print-pdf mode, skip the password modal entirely and load slides directly.
-    // The user is already at the URL, so they're considered authenticated for export.
+    // Print-pdf mode skips the password modal entirely
     const isPrintMode = window.location.search.includes('print-pdf');
 
     if (IS_PROTECTED && !isPrintMode) {

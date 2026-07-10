@@ -31,30 +31,22 @@ export function renderIndexPage(presentations: Presentation[]): string {
       : "";
 
   return `<!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Slides — amansanoj</title>
+
+  <!-- Brand: design tokens + Instrument Sans, Geist, Geist Mono -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@amansanoj/brand/globals.css" />
+
   <style>
     *, *::before, *::after { box-sizing: border-box; }
 
-    :root {
-      --bg: #0f1117;
-      --surface: #1a1d27;
-      --border: #2a2d3a;
-      --text: #e8eaf0;
-      --muted: #7c7f8e;
-      --accent: #7c6df5;
-      --accent-hover: #9b8ff7;
-      --green: #4caf7d;
-      --radius: 10px;
-    }
-
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: var(--bg);
-      color: var(--text);
+      font-family: var(--font-body);
+      background: var(--background);
+      color: var(--foreground);
       margin: 0;
       padding: 2rem 1rem;
       min-height: 100vh;
@@ -65,26 +57,35 @@ export function renderIndexPage(presentations: Presentation[]): string {
       margin: 0 auto;
     }
 
+    /* ── Header ── */
     header {
       margin-bottom: 2.5rem;
     }
 
     header h1 {
+      font-family: var(--font-display);
       font-size: 2rem;
       font-weight: 700;
       margin: 0 0 0.25rem;
-      background: linear-gradient(135deg, var(--accent), var(--accent-hover));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      color: var(--primary);
     }
 
     header p {
-      color: var(--muted);
+      color: var(--muted-foreground);
       margin: 0;
       font-size: 0.95rem;
     }
 
+    header p a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    header p a:hover {
+      color: var(--primary-light);
+    }
+
+    /* ── List ── */
     .presentation-list {
       list-style: none;
       padding: 0;
@@ -95,7 +96,7 @@ export function renderIndexPage(presentations: Presentation[]): string {
     }
 
     .presentation-item {
-      background: var(--surface);
+      background: var(--card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
       padding: 1rem 1.25rem;
@@ -107,12 +108,12 @@ export function renderIndexPage(presentations: Presentation[]): string {
     }
 
     .presentation-item:hover {
-      border-color: var(--accent);
+      border-color: var(--primary);
     }
 
     .presentation-link {
       text-decoration: none;
-      color: var(--text);
+      color: var(--card-foreground);
       font-weight: 500;
       font-size: 1rem;
       flex: 1;
@@ -127,7 +128,7 @@ export function renderIndexPage(presentations: Presentation[]): string {
     }
 
     .presentation-link:hover .presentation-title {
-      color: var(--accent-hover);
+      color: var(--primary);
     }
 
     .presentation-meta {
@@ -137,6 +138,7 @@ export function renderIndexPage(presentations: Presentation[]): string {
       flex-shrink: 0;
     }
 
+    /* ── Badges ── */
     .badge {
       font-size: 0.75rem;
       padding: 0.2rem 0.6rem;
@@ -146,46 +148,54 @@ export function renderIndexPage(presentations: Presentation[]): string {
     }
 
     .badge.protected {
-      background: rgba(255, 180, 0, 0.15);
-      color: #f0b942;
-      border: 1px solid rgba(255, 180, 0, 0.25);
+      background: color-mix(in oklch, var(--secondary) 15%, transparent);
+      color: var(--secondary);
+      border: 1px solid color-mix(in oklch, var(--secondary) 30%, transparent);
     }
 
     .badge.public {
-      background: rgba(76, 175, 125, 0.15);
-      color: var(--green);
-      border: 1px solid rgba(76, 175, 125, 0.25);
+      background: color-mix(in oklch, var(--primary) 15%, transparent);
+      color: var(--primary);
+      border: 1px solid color-mix(in oklch, var(--primary) 30%, transparent);
     }
 
     .presentation-date {
       font-size: 0.8rem;
-      color: var(--muted);
+      color: var(--muted-foreground);
     }
 
+    /* ── Empty state ── */
     .empty-state {
-      color: var(--muted);
+      color: var(--muted-foreground);
       text-align: center;
       padding: 3rem 1rem;
       font-size: 0.95rem;
     }
 
     .empty-state code {
-      background: var(--surface);
+      background: var(--muted);
+      color: var(--foreground);
       padding: 0.1rem 0.4rem;
-      border-radius: 4px;
+      border-radius: calc(var(--radius) / 2);
+      font-family: var(--font-mono);
       font-size: 0.9em;
     }
 
+    /* ── Footer ── */
     footer {
       margin-top: 3rem;
       text-align: center;
       font-size: 0.8rem;
-      color: var(--muted);
+      color: var(--muted-foreground);
     }
 
     footer a {
-      color: var(--accent);
+      color: var(--primary);
       text-decoration: none;
+    }
+
+    footer a:hover {
+      color: var(--primary-light);
     }
 
     @media (max-width: 500px) {
@@ -200,7 +210,7 @@ export function renderIndexPage(presentations: Presentation[]): string {
   <div class="container">
     <header>
       <h1>Slides</h1>
-      <p>Presentations by <a href="https://amansanoj.com" style="color:var(--accent);text-decoration:none;">amansanoj</a></p>
+      <p>Presentations by <a href="https://amansanoj.com">amansanoj</a></p>
     </header>
     <main>
       ${emptyState}
