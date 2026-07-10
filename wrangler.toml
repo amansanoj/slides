@@ -1,0 +1,14 @@
+name = "slides"
+main = "src/index.ts"
+compatibility_date = "2024-12-01"
+compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "slides-db"
+database_id = "ebc71d15-52c3-474f-b741-42ac6e6e57d1"
+
+[vars]
+# Base URL for fetching raw Markdown files from the GitHub repo.
+# Must not have a trailing slash.
+GITHUB_RAW_BASE = "https://raw.githubusercontent.com/amansanoj/slides/main"
