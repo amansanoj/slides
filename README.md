@@ -115,3 +115,4 @@ Speaker notes go here (press S to open)
 ## PDF export
 
 Append `?print-pdf` to the URL and use the browser's **Print → Save as PDF** option. Or click the **📄 PDF** button in the top-right toolbar.
+
